@@ -15,11 +15,9 @@ export default function MyKeyboard({
   const [secondNumber, setSecondNumber] = React.useState("");
   const [operation, setOperation] = React.useState("");
   const [result, setResult] = React.useState<number | null>(null);
-  const [history, setHistory] = React.useState<{ expression: string; result: string }[]>([]);
 
   const handleNumberPress = (buttonValue: string) => {
     if (result !== null) {
-      // If there's a result already, replace the first number with the result.
       setFirstNumber(buttonValue);
       setResult(null);
     } else {
@@ -30,15 +28,23 @@ export default function MyKeyboard({
   };
 
   const handleOperationPress = (buttonValue: string) => {
-    if (result !== null) {
-      // Use the result as the second number if an operation is pressed after a result.
-      setSecondNumber(result.toString());
-      setFirstNumber("");
-      setOperation(buttonValue);
-    } else if (firstNumber) {
-      setOperation(buttonValue);
-      setSecondNumber(firstNumber);
-      setFirstNumber("");
+    if (buttonValue === "X^2") {
+      if (firstNumber) {
+        const squared = Math.pow(parseFloat(firstNumber), 2);
+        setResult(squared);
+        addToHistory(`${firstNumber}²`, squared.toString());
+        setFirstNumber("");
+      }
+    } else {
+      if (result !== null) {
+        setSecondNumber(result.toString());
+        setFirstNumber("");
+        setOperation(buttonValue);
+      } else if (firstNumber) {
+        setOperation(buttonValue);
+        setSecondNumber(firstNumber);
+        setFirstNumber("");
+      }
     }
   };
 
@@ -69,9 +75,10 @@ export default function MyKeyboard({
               : "Error";
           break;
         case "％":
-          computation = parseFloat(firstNumber) !== 0
-            ? parseFloat(secondNumber) % parseFloat(firstNumber)
-            : "Error";
+          computation =
+            parseFloat(firstNumber) !== 0
+              ? parseFloat(secondNumber) % parseFloat(firstNumber)
+              : "Error";
           break;
         default:
           computation = "Error";
